@@ -32,6 +32,12 @@ _PATTERNS = [
 	re.compile(chr(0x2500)),  # box-drawing horizontal (use -)
 	re.compile(chr(0x2192)),  # rightwards arrow (use ->)
 	re.compile(chr(0x2026)),  # ellipsis (use ...)
+	# Mutating the environment of a live process is a data race against every
+	# getenv in it, including the ones inside libc and third-party code.
+	re.compile(r'\benv::(?:set_var|remove_var)\b'),
+	re.compile(r'\blibc::(?:setenv|unsetenv|putenv)\b'),
+	# ... including when imported, which hides the `env::` prefix at the call.
+	re.compile(r'\buse\s+(?:std::)?env::\{?[^;]*\b(?:set_var|remove_var)\b'),
 ]
 
 
